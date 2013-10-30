@@ -9,8 +9,10 @@ entity ALU is
 end ALU;
 
 architecture rtl of ALU is 
+	signal Negatives, 
+   		   Carries, 
+   		   Overflows:			std_logic_vector(15  downto 0);
     signal Outputs: 			std_logic_vector(511 downto 0);
-   	signal Negatives, Carries:	std_logic_vector(15  downto 0);
 	signal FinalOutput:			std_logic_vector(31  downto 0);
 	signal ZeroOut16: 			std_logic_vector(15  downto 0);
 	signal ZeroOut8: 			std_logic_vector(7   downto 0);
@@ -18,7 +20,7 @@ architecture rtl of ALU is
 	signal FlipSig:				std_logic;
 begin
 	FlipSig <= not Operation(0) after 5 ps;
-	Adder32: entity work.Adder32 port map(Value1, Value2, Operation(2), FlipSig, Outputs(31 downto 0), Overflow, Negatives(0), Carries(0));
+	Adder32: entity work.Adder32 port map(Value1, Value2, Operation(2), FlipSig, Outputs(31 downto 0), Overflows(0), Negatives(0), Carries(0));
 	Shift32: entity work.Shift32 port map(Value1, Value2, Operation(0), Outputs(95 downto 64), Negatives(2), Carries(2));
 	Less32: entity work.Less32 port map(Value1, Value2, Outputs(191 downto 160), Negatives(5));
 	Xor32: entity work.Xor32 port map(Value1, Value2, Outputs(287 downto 256), Negatives(8));
@@ -37,14 +39,19 @@ begin
 	Carries(4) <= Carries(0);
 	Carries(15 downto 5) <= "00000000000";
 
-
 	Negatives(1) <= Negatives(0);
-	Negatives(3) <= Negatives(2);
 	Negatives(4) <= Negatives(0);
+	Negatives(3) <= Negatives(2);
+
+	Overflows(1) <= Overflows(0);
+	Overflows(4) <= Overflows(0);
+	Overflows(3 downto 2) <= "00";
+	Overflows(15 downto 5) <= "00000000000";
 
 	MuxOutputs: entity work.Mux512to32 port map(Outputs, Operation, FinalOutput);
-	MuxCarries: entity work.Mux16to1 port map(Carries, Operation, CarryOut);
+	MuxOverflows: entity work.Mux16to1 port map(Overflows, Operation, Overflow);
 	MuxNegatives: entity work.Mux16to1 port map(Negatives, Operation, Negative);
+	MuxCarries: entity work.Mux16to1 port map(Carries, Operation, CarryOut);
 
 
 	-- Checks if output value is zero
