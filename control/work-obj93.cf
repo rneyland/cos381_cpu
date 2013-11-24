@@ -1,4 +1,0 @@
-v 3
-file . "Control.vhdl" "20131118022403.000" "20131117212404.688":
-  entity control at 1( 0) + 0 on 15;
-  architecture rtl of control at 11( 338) + 0 on 16;
