@@ -2,86 +2,45 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity RegFile is
-	port
-	(
-		reg1, reg2, writeReg: in std_logic_vector(4 downto 0);
-		we, clock: in std_logic;
-		writeData: in std_logic_vector(31 downto 0);
-		read1Data, read2Data: out std_logic_vector(31 downto 0)
-	);
+	port(	Reg1, Reg2, WriteReg: in std_logic_vector(4 downto 0);
+			WE, Clock: in std_logic;
+			WriteData: in std_logic_vector(31 downto 0);
+			Read1Data, Read2Data: out std_logic_vector(31 downto 0));
 end RegFile;
 
 architecture rtl of RegFile is
-	component deco5to32
-		port
-		(
-			input:	in std_logic_vector(4 downto 0);
-			enable:	in std_logic;
-			output:	out std_logic_vector(31 downto 0)
-		);
-	end component;
-
-	component mux3232to1 
-		port
-		(
-			input:	in std_logic_vector(1023 downto 0);
-			sel:	in std_logic_vector(4 downto 0);
-			output:	out std_logic_vector(31 downto 0)
-		);
-	end component;
-	
-	component reg32
-		port
-		(
-			d:		in	std_logic_vector(31 downto 0);
-			clock:	in 	std_logic;
-			we:		in 	std_logic;
-			q:		out	std_logic_vector(31 downto 0)
-		);
-	end component;
-	
-	signal qArray:	std_logic_vector(1023 downto 0);
-	signal decoded: std_logic_vector(31 downto 0);
+	signal Data:	std_logic_vector(1023 downto 0);
+	signal Decoded: std_logic_vector(31 downto 0);
 	
 begin
-	reg0: reg32 port map
-	(
-		d		=>	"00000000000000000000000000000000",
-		clock	=> 	clock,
-		we		=>	'1',
-		q		=>	qArray(31 downto 0)
-	);
+	Reg32: entity work.Reg32 port map(
+		D		=>	"00000000000000000000000000000000",
+		Clock	=> 	Clock,
+		We		=>	'1',
+		Q		=>	Data(31 downto 0));
 
 	gen: for i in 1 to 31 generate
-		registers: reg32 port map
-		(
-			d 		=> 	writeData,
-			clock	=>	clock,
-			we 		=>	decoded(i),
-			q		=>	qArray((((i+1)*32)-1) downto (i*32))
-		);
+		Reg32: entity work.Reg32 port map(
+			D 		=> 	WriteData,
+			Clock	=>	Clock,
+			We 		=>	Decoded(i),
+			Q		=>	Data((((i+1)*32)-1) downto (i*32)));
 	end generate gen;
 	
-	decoA: deco5to32 port map
-	(
-		input 	=> 	writeReg,
-		enable	=> 	we,
-		output	=>	decoded
-	);
+	Deco5to32: entity work.Deco5to32 port map(
+		Input 	=> 	WriteReg,
+		Enable	=> 	WE,
+		Output	=>	Decoded);
 
-	muxA: mux3232to1 port map
-	(
-		input	=>	qArray,
-		sel		=>	reg1,
-		output	=>	read1Data
-	);
+	Mux3232to1: entity work.Mux32_32to1 port map(
+		Input	=>	Data,
+		Sel		=>	Reg1,
+		Output	=>	Read1Data);
 
-	muxB: mux3232to1 port map
-	(
-		input	=>	qArray,
-		sel		=>	reg2,
-		output	=>	read2Data
-	);		
+	Mux3232to1: Mux3232to1 port map(
+		Input	=>	Data,
+		Sel		=>	Reg2,
+		Output	=>	Read2Data);		
 end rtl;
 
 

@@ -1,171 +1,97 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-ENTITY Control IS
-	PORT(	Operation: 	IN STD_LOGIC_VECTOR(31 DOWNTO 26);
-			Func: 		IN STD_LOGIC_VECTOR(5 DOWNTO 0);
-			Branch, MemRead, MemWrite, RegWrite, SignExtend, ALUSrc1: OUT STD_LOGIC;
-			ALUSrc2, MemToReg, WriteRegDst, PCSrc, ALUOpType: OUT STD_LOGIC_VECTOR(1 DOWNTO 0));
-END Control;
+entity Control is
+	port(	Operation: 	in std_logic_vector(31 downto 26);
+			Func: 		in std_logic_vector(5 downto 0);
+			Branch, MemRead, MemWrite, RegWrite, SignExtend, ALUSrc1: out std_logic;
+			ALUSrc2, MemToReg, WriteRegDst, PCSrc, ALUOpType: out std_logic_vector(1 downto 0));
+end Control;
 
-ARCHITECTURE rtl OF Control IS
-BEGIN
+architecture rtl of Control is
+begin
 
---Control: PROCESS
---BEGIN
-PROCESS(Operation)
-BEGIN
-	PROCESS(Operation, Func) IS
-	BEGIN
-		CASE OPERATION IS
-			-- ADD
-			WHEN "000000"	=>	Branch <= '0';
-								MemRead <= '0';
-								MemWrite <= '0';
-								RegWrite <=	'1';
-								SignExtend <= '0';
-								ALUSrc1 <= '0';
-								ALUSrc2 <= "00";
-								MemToReg <= "00";
-								WriteRegDst <= "01";
-								PCSrc <= "00";
-								ALUOpType <= "00";
-			-- ADDU
-			WHEN "001000" =>	Branch <= '0';
-								MemRead <= '0';
-								MemWrite <= '0';
-								RegWrite <=	'1';
-								SignExtend <= '0';
-								ALUSrc1 <= '0';
-								ALUSrc2 <= "00";
-								MemToReg <= "00";
-								WriteRegDst <= "01";
-								PCSrc <= "00";
-								ALUOpType <= "00";
+	process(Operation, Func) is
+	begin
+		case Operation is
+			when "000000" =>
+				Branch <= '0';
+				MemRead <= '0';
+				MemWrite <= '0';
+				RegWrite <= '1'; 
+				ALUSrc1 <= '0';
+				ALUSrc2 <= "00";
+				MemToReg <= "00";
+				WriteRegDst <= "01";
+				PCSrc <= "00";
+
+
+				if Func = "010100" or "010110" then 
+					SignExtend <= '1';
+				else 
+					SignExtend <= '0';
+				end if;
+
+
+				if Func = "010100" Func = "010101" then
+					ALUOpType <= "00";
+				elsif Func = "010110" or Func "010111" then
+					ALUOpType <= "01";
+				elsif Func = "011001" then
+					--or
+				else 
+					ALUOpType <= "10";
+				end if;
+
 			-- ADDI
-			WHEN "001000" =>	Branch <= '0' AFTER 20 ps;
-								MemRead <= '0' AFTER 20 ps;
-								MemWrite <= '0' AFTER 20 ps;
-								RegWrite <= '1' AFTER 20 ps;
-								SignExtend <= '1' AFTER 20 ps;
-								ALUSrc1 <= '0' AFTER 20 ps;
-								ALUSrc2 <= "01" AFTER 20 ps;
-								MemToReg <= "00" AFTER 20 ps;
-								WriteRegDst <= "00" AFTER 20 ps;
-								PCSrc <= "00" AFTER 20 ps;
-								ALUOpType <= "00" AFTER 20 ps;
+			when "001000" =>	Branch <= '0' after 20 ps;
+								MemRead <= '0' after 20 ps;
+								MemWrite <= '0' after 20 ps;
+								RegWrite <= '1' after 20 ps;
+								SignExtend <= '1' after 20 ps;
+								ALUSrc1 <= '0' after 20 ps;
+								ALUSrc2 <= "01" after 20 ps;
+								MemToReg <= "00" after 20 ps;
+								WriteRegDst <= "00" after 20 ps;
+								PCSrc <= "00" after 20 ps;
+								ALUOpType <= "00" after 20 ps;
 			-- ADDUI
-			WHEN "001000" =>	Branch <= '0' AFTER 20 ps;
-								MemRead <= '0' AFTER 20 ps;
-								MemWrite <= '0' AFTER 20 ps;
-								RegWrite <= '1' AFTER 20 ps;
-								SignExtend <= '1' AFTER 20 ps;
-								ALUSrc1 <= '0' AFTER 20 ps;
-								ALUSrc2 <= "01" AFTER 20 ps;
-								MemToReg <= "00" AFTER 20 ps;
-								WriteRegDst <= "00" AFTER 20 ps;
-								PCSrc <= "00" AFTER 20 ps;
-								ALUOpType <= "00" AFTER 20 ps;
-			-- SUB
-			WHEN "000001"	=>	Branch <= '0';
-								MemRead <= '0';
-								MemWrite <= '0';
-								RegWrite <=	'1';
-								SignExtend <= '0';
-								ALUSrc1 <= '0';
-								ALUSrc2 <= "00";
-								MemToReg <= "00";
-								WriteRegDst <= "01";
-								PCSrc <= "00";
-								ALUOpType <= "01";
-			-- NOR
-			WHEN "100111"	=>	Branch <= '0';
-								MemRead <= '0';
-								MemWrite <= '0';
-								RegWrite <=	'1';
-								SignExtend <= '0';
-								ALUSrc1 <= '0';
-								ALUSrc2 <= "00";
-								MemToReg <= "00";
-								WriteRegDst <= "01";
-								PCSrc <= "00";
-								ALUOpType <= "10";
-			-- XOR
-			WHEN "100110"	=>	Branch <= '0';
-								MemRead <= '0';
-								MemWrite <= '0';
-								RegWrite <=	'1';
-								SignExtend <= '0';
-								ALUSrc1 <= '0';
-								ALUSrc2 <= "00";
-								MemToReg <= "00";
-								WriteRegDst <= "01";
-								PCSrc <= "00";
-								ALUOpType <= "10";
+			when "001000" =>	Branch <= '0' after 20 ps;
+								MemRead <= '0' after 20 ps;
+								MemWrite <= '0' after 20 ps;
+								RegWrite <= '1' after 20 ps;
+								SignExtend <= '0' after 20 ps;
+								ALUSrc1 <= '0' after 20 ps;
+								ALUSrc2 <= "01" after 20 ps;
+								MemToReg <= "00" after 20 ps;
+								WriteRegDst <= "00" after 20 ps;
+								PCSrc <= "00" after 20 ps;
+								ALUOpType <= "00" after 20 ps;
 			-- LW
-			WHEN "100011" =>	Branch <= '0' AFTER 20 ps;
-								MemRead <= '1' AFTER 20 ps;
-								MemWrite <= '0' AFTER 20 ps;
-								RegWrite <= '1' AFTER 20 ps;
-								SignExtend <= '1' AFTER 20 ps;
-								ALUSrc1 <= '0' AFTER 20 ps;
-								ALUSrc2 <= "01" AFTER 20 ps;
-								MemToReg <= "01" AFTER 20 ps;
-								WriteRegDst <= "00" AFTER 20 ps;
-								PCSrc <= "00" AFTER 20 ps;
+			when "100011" =>	Branch <= '0' after 20 ps;
+								MemRead <= '1' after 20 ps;
+								MemWrite <= '0' after 20 ps;
+								RegWrite <= '1' after 20 ps;
+								SignExtend <= '1' after 20 ps;
+								ALUSrc1 <= '0' after 20 ps;
+								ALUSrc2 <= "01" after 20 ps;
+								MemToReg <= "01" after 20 ps;
+								WriteRegDst <= "00" after 20 ps;
+								PCSrc <= "00" after 20 ps;
 			-- SW
-			WHEN "101011" =>	Branch <= '0' AFTER 20 ps;
-								MemRead <= '0' AFTER 20 ps;
-								MemWrite <= '1' AFTER 20 ps;
-								RegWrite <= '1' AFTER 20 ps;
-								SignExtend <= '1' AFTER 20 ps;
-								ALUSrc1 <= '0' AFTER 20 ps;
-								ALUSrc2 <= "01" AFTER 20 ps;
-								MemToReg <= "10" AFTER 20 ps;
-								WriteRegDst <= "00" AFTER 20 ps;
-								PCSrc <= "00" AFTER 20 ps;
-			-- SLT
-			WHEN "101010" =>	Branch <= '0' AFTER 20 ps;
-								MemRead <= '0' AFTER 20 ps;
-								MemWrite <= '0' AFTER 20 ps;
-								RegWrite <= '1' AFTER 20 ps;
-								SignExtend <= '0' AFTER 20 ps;
-								ALUSrc1 <= '0' AFTER 20 ps; --hardcode 4 
-								ALUSrc2 <= "00" AFTER 20 ps; -- second read from reg, 32bit extended, 32bit extended & shamt, PC
-								MemToReg <= "00" AFTER 20 ps; -- from ALU, data memory, PC
-								WriteRegDst <= "00" AFTER 20 ps; -- rt, rd, or 31 reg
-								PCSrc <= "00" AFTER 20 ps; -- PC+4, J-type, first read from reg
-								ALUOpType <= "10";
-			-- SLL
-			WHEN "000000" =>	Branch <= '0' AFTER 20 ps;
-								MemRead <= '0' AFTER 20 ps;
-								MemWrite <= '0' AFTER 20 ps;
-								RegWrite <= '1' AFTER 20 ps;
-								SignExtend <= '0' AFTER 20 ps;
-								ALUSrc1 <= '0' AFTER 20 ps;
-								ALUSrc2 <= "00" AFTER 20 ps;
-								MemToReg <= "00" AFTER 20 ps;
-								WriteRegDst <= "01" AFTER 20 ps;
-								PCSrc <= "00" AFTER 20 ps;
-								ALUOpType <= "10";
-			-- SRL
-			WHEN "000000" =>	Branch <= '0' AFTER 20 ps;
-								MemRead <= '0' AFTER 20 ps;
-								MemWrite <= '0' AFTER 20 ps;
-								RegWrite <= '1' AFTER 20 ps;
-								SignExtend <= '0' AFTER 20 ps;
-								ALUSrc1 <= '0' AFTER 20 ps;
-								ALUSrc2 <= "00" AFTER 20 ps;
-								MemToReg <= "00" AFTER 20 ps;
-								WriteRegDst <= "01" AFTER 20 ps;
-								PCSrc <= "00" AFTER 20 ps;
-								ALUOpType <= "10";
-
-
-				
+			when "101011" =>	Branch <= '0' after 20 ps;
+								MemRead <= '0' after 20 ps;
+								MemWrite <= '1' after 20 ps;
+								RegWrite <= '1' after 20 ps;
+								SignExtend <= '1' after 20 ps;
+								ALUSrc1 <= '0' after 20 ps;
+								ALUSrc2 <= "01" after 20 ps;
+								MemToReg <= "10" after 20 ps;
+								WriteRegDst <= "00" after 20 ps;
+								PCSrc <= "00" after 20 ps;
 
 
 
-
-	END;
-END ARCHITECTURE rtl; 
+		end case; 
+	end process;
+end rtl;
